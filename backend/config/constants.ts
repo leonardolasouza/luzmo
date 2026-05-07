@@ -5,10 +5,23 @@ dotenv.config();
 
 export const LUZMO_TOKEN_INACTIVITY_INTERVAL = 3600; // 1 hour
 
-if (!process.env.LUZMO_DASHBOARD_ID) {
-  throw new Error('FATAL: LUZMO_DASHBOARD_ID is missing.');
+// Parse all available dashboard IDs from environment
+const dashboardIds: string[] = [];
+let i = 1;
+while (process.env[`LUZMO_DASHBOARD_ID_${i}`]) {
+  dashboardIds.push(process.env[`LUZMO_DASHBOARD_ID_${i}`] as string);
+  i++;
 }
-export const DEFAULT_DASHBOARD_ID = process.env.LUZMO_DASHBOARD_ID;
+
+// Fallback for the single LUZMO_DASHBOARD_ID if provided
+if (process.env.LUZMO_DASHBOARD_ID) {
+  dashboardIds.push(process.env.LUZMO_DASHBOARD_ID);
+}
+
+if (dashboardIds.length === 0) {
+  throw new Error('FATAL: No LUZMO_DASHBOARD_ID found in environment.');
+}
+export const DASHBOARD_IDS = dashboardIds;
 
 if (!process.env.LUZMO_API_KEY) {
   throw new Error('FATAL: LUZMO_API_KEY is missing.');
@@ -20,9 +33,7 @@ if (!process.env.LUZMO_API_TOKEN) {
 }
 export const LUZMO_API_TOKEN = process.env.LUZMO_API_TOKEN;
 
-if (!process.env.LUZMO_INTEGRATION_ID) {
-  throw new Error('FATAL: LUZMO_INTEGRATION_ID is missing.');
-}
+// Integration ID is optional for some authorization types
 export const LUZMO_INTEGRATION_ID = process.env.LUZMO_INTEGRATION_ID;
 
 if (!process.env.PORT) {

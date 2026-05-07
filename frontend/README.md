@@ -17,9 +17,9 @@ This application strictly adheres to the "Dummy Frontend" principle.
 ## How It Works
 
 1. When `index.html` loads, the `app.ts` script executes.
-2. It fetches a temporary SSO token from the backend's `/api/v1/token` endpoint (pointing to [Constants.md](../docs/spec/PRDs/Constants.md)).
-3. It takes the retrieved `authKey` and `authToken` and injects them directly into the `<luzmo-dashboard>` Web Component (loaded via the official Luzmo CDN).
-4. The Web Component then handles rendering the dashboard directly from Luzmo's servers.
+2. It fetches a temporary SSO token from the backend's `/api/v1/token` endpoint (pointing to [Constants.md](../docs/spec/PRDs/Constants.md)). This single token grants access to all dashboards configured in the backend.
+3. It iterates through the retrieved `dashboardIds` and injects the token into multiple `<luzmo-embed-dashboard>` Web Components.
+4. The Web Components then handle rendering the dashboards directly from Luzmo's servers.
 
 ## Development
 

@@ -28,10 +28,13 @@ Before running the application, you must provide your Luzmo credentials.
 ```env
 LUZMO_API_KEY=your_api_key_here
 LUZMO_API_TOKEN=your_api_token_here
+LUZMO_DASHBOARD_ID_1=your_first_dashboard_id_here
+LUZMO_DASHBOARD_ID_2=your_second_dashboard_id_here
 LUZMO_INTEGRATION_ID=your_integration_id_here
-LUZMO_DASHBOARD_ID=your_dashboard_id_here
 PORT=3500
 ```
+
+*Note: The PoC supports multiple dashboards. You can add more by following the `LUZMO_DASHBOARD_ID_X` pattern.*
 
 ### Running the Application
 

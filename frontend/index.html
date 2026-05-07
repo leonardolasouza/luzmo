@@ -1,26 +1,25 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Luzmo Multi-Dashboard Demo</title>
+    <link rel="stylesheet" href="/css/index.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <title>Luzmo Embedded Dashboard</title>
-  <link rel="stylesheet" href="/css/index.css" />
-</head>
+  <body>
+    <div class="header">
+      <h1>Luzmo Multi-Dashboard PoC</h1>
+      <p>Demonstrating secure, server-side token generation for multiple dashboards.</p>
+    </div>
 
-<body>
-  <div class="header">
-    <h1>Luzmo Analytics Dashboard</h1>
-    <p>This is a dummy frontend demonstrating secure server-side token generation.</p>
-  </div>
-
-  <div class="dashboard-container">
-    <div id="loading">Loading dashboard securely...</div>
+    <div id="loading">Loading dashboards securely...</div>
     <div id="error-message" class="error"></div>
-    <luzmo-dashboard id="dashboard"></luzmo-dashboard>
-  </div>
 
-  <!-- Load our compiled TypeScript app -->
-  <script type="module" src="/dist/app.js"></script>
-</body>
+    <div id="dashboards-container" class="dashboards-grid">
+      <!-- Dashboards will be injected here -->
+    </div>
 
+    <!-- Load our compiled TypeScript app -->
+    <script type="module" src="/dist/app.js"></script>
+  </body>
 </html>

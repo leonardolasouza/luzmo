@@ -12,7 +12,7 @@ interface StandardResponse<T = unknown> {
 interface LuzmoTokenResult {
   id: string;
   token: string;
-  dashboardId: string;
+  dashboardIds: string[];
 }
 
 /**
@@ -20,7 +20,6 @@ interface LuzmoTokenResult {
  */
 function loadScript(url: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    // Avoid double loading
     if (document.querySelector(`script[src="${url}"]`)) {
       resolve();
       return;
@@ -34,18 +33,21 @@ function loadScript(url: string): Promise<void> {
   });
 }
 
-async function loadDashboard() {
+async function loadDashboards() {
   const loadingEl = document.getElementById('loading');
   const errorEl = document.getElementById('error-message');
-  const dashboard = document.getElementById('dashboard') as any;
+  const containerEl = document.getElementById('dashboards-container');
 
-  if (!loadingEl || !errorEl || !dashboard) return;
+  if (!loadingEl || !errorEl || !containerEl) return;
+
+  // Ensure error element is hidden initially
+  errorEl.style.display = 'none';
 
   try {
     // 0. Load the Luzmo SDK first
     await loadScript(LUZMO_EMBED_URL);
 
-    // 1. Fetch secure token from the backend
+    // 1. Fetch secure token from the backend (grants access to all dashboards)
     const response = await fetch(ROUTE_AUTH_TOKEN);
     const data: StandardResponse<LuzmoTokenResult> = await response.json();
 
@@ -53,24 +55,45 @@ async function loadDashboard() {
       throw new Error(data.errors[0]?.message || 'Failed to get token');
     }
 
-    // 2. Inject token into the web component
-    dashboard.authKey = data.result.id;
-    dashboard.authToken = data.result.token;
+    const { id, token, dashboardIds } = data.result;
 
-    if (!data.result.dashboardId) {
-      throw new Error('Dashboard ID is missing from the server response');
+    if (!dashboardIds || dashboardIds.length === 0) {
+      throw new Error('No Dashboard IDs returned from the server');
     }
-    dashboard.dashboardId = data.result.dashboardId;
+
+    // 2. Clear container and inject dashboards
+    containerEl.innerHTML = '';
+
+    dashboardIds.forEach((dashboardId, index) => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'dashboard-wrapper';
+
+      const title = document.createElement('h3');
+      title.innerText = `Dashboard ${index + 1}`;
+      wrapper.appendChild(title);
+
+      const embed = document.createElement('luzmo-embed-dashboard') as any;
+      embed.dashboardId = dashboardId;
+      embed.authKey = id;
+      embed.authToken = token;
+
+      wrapper.appendChild(embed);
+      containerEl.appendChild(wrapper);
+    });
 
     loadingEl.style.display = 'none';
   } catch (error: unknown) {
     loadingEl.style.display = 'none';
     const message = error instanceof Error ? error.message : 'Unknown error';
+
+    // Display error message and make the element visible
     errorEl.innerText = `Error: ${message}`;
-    console.error('Dashboard load error:', error);
+    errorEl.style.display = 'block';
+
+    console.error('Dashboards load error:', error);
   }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  loadDashboard();
+  loadDashboards();
 });

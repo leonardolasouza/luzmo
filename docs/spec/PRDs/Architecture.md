@@ -14,7 +14,8 @@ The solution employs a lightweight two-tier architecture:
 graph TD
     subgraph Client [Browser / Frontend]
         App[HTML/TypeScript App]
-        Embed[Luzmo Web Component]
+        Embed1[Luzmo Web Component 1]
+        Embed2[Luzmo Web Component 2]
     end
 
     subgraph Server [Backend: Node.js/Express]
@@ -30,14 +31,17 @@ graph TD
 
     App -- "1. GET /api/v1/token" --> API
     API -- "2. Read Credentials" --> Config
-    API -- "3. Request SSO Token" --> SDK
+    API -- "3. Request SSO Token (Multi-ID)" --> SDK
     SDK -- "4. API Call" --> L_API
     L_API -- "5. Return Temp Token" --> SDK
-    SDK -- "6. Send Token + DashboardID" --> API
+    SDK -- "6. Send Token + List of IDs" --> API
     API -- "7. Response" --> App
-    App -- "8. Injects Token" --> Embed
-    Embed -- "9. Request Dashboard" --> L_Dash
-    L_Dash -- "10. Render Data" --> Embed
+    App -- "8. Injects Token into N components" --> Embed1
+    App -- "8. Injects Token into N components" --> Embed2
+    Embed1 -- "9. Request Dash 1" --> L_Dash
+    Embed2 -- "9. Request Dash 2" --> L_Dash
+    L_Dash -- "10. Render Data" --> Embed1
+    L_Dash -- "10. Render Data" --> Embed2
 ```
 
 > [!NOTE]
@@ -55,10 +59,10 @@ Detailed specifications, security standards, and backend responsibilities are ma
 
 ### 4.1 Token Generation Flow
 1. **Client Request:** The frontend application makes a `GET` request to the backend's `/api/v1/token` endpoint on load (pointing to [Constants.md](./Constants.md)).
-2. **Backend Authentication:** The Node.js backend uses its securely stored `LUZMO_API_KEY` and `LUZMO_API_TOKEN` to request an SSO token from the Luzmo API via the SDK.
+2. **Backend Authentication:** The Node.js backend uses its securely stored `LUZMO_API_KEY` and `LUZMO_API_TOKEN` to request an SSO token from the Luzmo API via the SDK. The request includes all dashboard IDs configured in the environment.
 3. **Token Response:** Luzmo returns a temporary authorization token (with a defined `inactivity_interval`).
-4. **Token Delivery:** The backend forwards this temporary token to the frontend.
-5. **Dashboard Rendering:** The frontend injects the temporary token and the `dashboardId` into the `<luzmo-dashboard>` web component, which then securely requests and renders the dashboard data directly from Luzmo's servers.
+4. **Token Delivery:** The backend forwards this temporary token and the list of `dashboardIds` to the frontend.
+5. **Dashboard Rendering:** The frontend iterates through the `dashboardIds`, creating a `<luzmo-embed-dashboard>` web component for each and injecting the same temporary token. Each component then securely requests and renders its respective dashboard data directly from Luzmo's servers.
 
 ### Token Generation Sequence Diagram
 
@@ -77,10 +81,10 @@ sequenceDiagram
     activate L
     L-->>B: Temporary SSO Token (authKey, authToken)
     deactivate L
-    B-->>F: JSON { error, errors, result: { id, token, dashboardId } }
+    B-->>F: JSON { error, errors, result: { id, token, dashboardIds: [...] } }
     deactivate B
 
-    Note over F: Assign result to <br/> <luzmo-dashboard> component
+    Note over F: For each dashboardId:<br/>Assign result to <br/> <luzmo-dashboard> component
     F->>L: Request Dashboard Rendering (using temporary token)
     activate L
     L-->>F: Dashboard UI & Data

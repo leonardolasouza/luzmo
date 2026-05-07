@@ -16,7 +16,7 @@ When a request is successful, `error` is `false`, `errors` is empty, and `result
   "result": {
     "id": "e2a4...",
     "token": "b8f9...",
-    "dashboardId": "d1e5..."
+    "dashboardIds": ["d1e5...", "f2a6..."]
   }
 }
 ```
@@ -71,7 +71,7 @@ Generates and returns a temporary Single Sign-On (SSO) authorization token from 
   "result": {
     "id": "e2a4...",
     "token": "b8f9...",
-    "dashboardId": "d1e5..."
+    "dashboardIds": ["d1e5...", "f2a6..."]
   }
 }
 ```

@@ -9,10 +9,9 @@ import {
   LUZMO_TOKEN_INACTIVITY_INTERVAL,
   FRONTEND_DIR,
   ROUTE_AUTH_TOKEN,
-  DEFAULT_DASHBOARD_ID,
+  DASHBOARD_IDS,
   LUZMO_API_KEY,
   LUZMO_API_TOKEN,
-  LUZMO_INTEGRATION_ID,
 } from '../config/constants';
 
 dotenv.config();
@@ -42,26 +41,36 @@ interface StandardResponse<T = unknown> {
 
 app.get(ROUTE_AUTH_TOKEN, async (req: Request, res: Response) => {
   try {
+    // Grant access to ALL configured dashboards in a single token
+    const dashboardsAccess = DASHBOARD_IDS.map((id) => ({
+      id,
+      rights: 'read',
+    }));
+
     const tokenResponse = await luzmoClient.create('authorization', {
-      type: 'sso',
-      integration_id: LUZMO_INTEGRATION_ID,
+      type: 'embed',
       inactivity_interval: LUZMO_TOKEN_INACTIVITY_INTERVAL,
+      username: 'poc-user',
+      name: 'PoC User',
+      email: 'poc@example.com',
+      access: {
+        dashboards: dashboardsAccess,
+      },
     });
 
-    const response: StandardResponse<{ id: string; token: string; dashboardId: string }> = {
+    const response: StandardResponse<{ id: string; token: string; dashboardIds: string[] }> = {
       error: false,
       errors: [],
       result: {
         id: tokenResponse.id,
         token: tokenResponse.token,
-        dashboardId: DEFAULT_DASHBOARD_ID,
+        dashboardIds: DASHBOARD_IDS,
       },
     };
 
     res.status(200).json(response);
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : 'Failed to authenticate with Luzmo platform.';
+  } catch (error: any) {
+    const errorMessage = error?.message || 'Failed to authenticate with Luzmo platform.';
     console.error('Error generating Luzmo token:', error);
 
     const errorResponse: StandardResponse = {
