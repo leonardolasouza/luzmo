@@ -1,0 +1,18 @@
+# Custom dir/files
+.dev
+
+# Dependencies
+node_modules/
+
+# Builds
+dist/
+backend/public/
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# OS Files
+.DS_Store
+Thumbs.db
