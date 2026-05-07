@@ -72,9 +72,9 @@ To ensure the security and stability of the embedded dashboard, this project use
 
 As per the technical assignment constraints, here are the deliverables:
 
-- **Link to your dashboard:** [Insert Luzmo Dashboard Link Here]
-- **Link to your application (or repo):** [Insert Repository Link Here]
-- **Video or written explanation:** [Insert Link to Video/Explanation Here]
+- **Link to your dashboard:** https://luzmo-app-554633983522.us-central1.run.app/
+- **Link to your application (or repo):** https://github.com/leonardolasouza/luzmo
+- **Video or written explanation:** Please see `docs/Explanation.mp4`
 
 ### What is being evaluated (from assignment)
 - Practical implementation
